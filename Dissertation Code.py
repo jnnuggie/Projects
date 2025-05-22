@@ -27,8 +27,6 @@ workers_23.show()
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
-
 new_staff = workers_23.join(workers_22, workers_23["worker_id"] == workers_22["worker_id"], "left_anti")
 
 new_staff_pd = new_staff.toPandas()
@@ -36,7 +34,7 @@ print(new_staff_pd)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, coalesce
+from pyspark.sql.functions import coalesce
 
 worker_data = workers_22.join(workers_23, "worker_id", "full_outer")
 
@@ -90,7 +88,7 @@ worker_data.show(truncate=False)
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, when, trim
+from pyspark.sql.functions import trim
 
 worker_data = worker_data.withColumn(
     "salary",
@@ -112,8 +110,6 @@ worker_data.printSchema()
 # COMMAND ----------
 
 
-from pyspark.sql.functions import when, col
-
 worker_data = worker_data.withColumn(
     "zerohours",
     when(col("zerohours").isin(-2, -1), 0)
@@ -123,8 +119,6 @@ worker_data = worker_data.withColumn(
 worker_data.select("zerohours").show(truncate=False)
 
 # COMMAND ----------
-
-from pyspark.sql.functions import when, col
 
 worker_data = worker_data.withColumn(
     "contract_type",
@@ -145,8 +139,6 @@ worker_data.show()
 
 # COMMAND ----------
 
-from pyspark.sql.functions import coalesce
-
 worker_data = worker_data.withColumn(
     "weekly_hours",
     coalesce(col("avghrs"), col("contrhrs")).cast("integer")
@@ -163,8 +155,6 @@ worker_data.show()
 
 
 # COMMAND ----------
-
-from pyspark.sql.functions import col
 
 all_columns = worker_data.columns
 
@@ -267,7 +257,7 @@ worker_data = worker_data.fillna({
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col, count, max as max_
+from pyspark.sql.functions import max as max_
 from pyspark.sql.window import Window
 
 def calculate_mode(df, column_name):
@@ -299,8 +289,6 @@ for column in worker_data.columns:
         print(f"Column {column} has no null values")
 
 # COMMAND ----------
-
-from pyspark.sql.functions import col
 
 median_age = worker_data.approxQuantile("age", [0.5], 0.01)[0]
 
@@ -352,8 +340,6 @@ worker_data = worker_data.withColumn(
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
-
 columns_to_check = ['main_service', 'region']
 
 unique_values_per_column = []
@@ -369,8 +355,6 @@ for column, values in unique_values_per_column:
     print(f"Unique values in {column}: {values}")
 
 # COMMAND ----------
-
-from pyspark.sql.functions import col
 
 worker_data = worker_data.withColumn("weekly_hours", col("weekly_hours").cast("integer"))
 
@@ -478,7 +462,7 @@ display(worker_data)
 # COMMAND ----------
 
 
-from pyspark.sql.functions import when, col, lit
+from pyspark.sql.functions import lit
 
 worker_data = worker_data.withColumn(
     "workplace_sector",
@@ -689,9 +673,6 @@ display(filtered_data.pd)
 
 # COMMAND ----------
 
-import seaborn as sns
-import matplotlib.pyplot as plt
-
 age_salary_df = filtered_data.select("age", "hourly_rate").toPandas()
 
 sns.pairplot(age_salary_df, diag_kind='kde', height=2.5)
@@ -699,8 +680,6 @@ plt.suptitle('Pair Plot for Age and Hourly Rate', y=1.02)
 plt.show()
 
 # COMMAND ----------
-
-import seaborn as sns
 
 qual_salary_df = filtered_data.select("holds_qual", "hourly_rate").toPandas()
 
@@ -718,10 +697,8 @@ plt.show()
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Convert the Spark DataFrame to a Pandas DataFrame
 age_contract_df = filtered_data.select("age_gr", "contract_type").dropna().toPandas()
 
-# Create a mapping of the original age groups to the new labels
 age_group_mapping = {
     270: "Under 18",
     271: "18 to 19",
